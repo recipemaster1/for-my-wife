@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wife Verification System 🚨</title>
+    <style>
+        :root {
+            --pink-bg: #ffafbd;
+            --rose-bg: #ffc3a0;
+            --heart-red: #ff4d6d;
+            --glass-white: rgba(255, 255, 255, 0.9);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--pink-bg), var(--rose-bg));
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .game-container {
+            background: var(--glass-white);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            z-index: 10;
+            transition: all 0.5s ease;
+        }
+
+        .screen { display: none; animation: fadeIn 0.5s ease; }
+        .active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+        h1 { color: var(--heart-red); font-size: 1.8rem; }
+        button {
+            background: var(--heart-red);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px;
+            transition: 0.3s;
+        }
+        button:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255, 77, 109, 0.4); }
+
+        input[type="text"], input[type="range"] {
+            width: 80%;
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+        }
+
+        /* Catch the Heart Styles */
+        #game-canvas {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+        }
+        .falling-heart {
+            position: absolute;
+            cursor: pointer;
+            font-size: 30px;
+            pointer-events: auto;
+            user-select: none;
+        }
+
+        .popup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            animation: slideIn 0.5s ease;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    </style>
+</head>
+<body>
+
+<div id="game-canvas"></div>
+
+<div class="game-container">
+    <div id="screen-1" class="screen active">
+        <h1>🚨 Wife Verification System Activated 🚨</h1>
+        <p>Only the most beautiful and slightly dramatic wife can enter 😜</p>
+        <input type="text" id="wifeName" placeholder="Enter your name...">
+        <br>
+        <button onclick="verifyWife()">Verify Yourself 💖</button>
+        <p id="verifyMsg"></p>
+    </div>
+
+    <div id="screen-2" class="screen">
+        <h2>Level 1: Love Quiz 😂</h2>
+        <p>Who loves you the most?</p>
+        <button onclick="quizResponse('Me')">Me 😎</button>
+        <button onclick="quizResponse('You')">You 😜</button>
+        <button onclick="quizResponse('Food')">Food 🍕</button>
+        <button onclick="quizResponse('Mom')">Mom 👀</button>
+        <p id="quizMsg"></p>
+    </div>
+
+    <div id="screen-3" class="screen">
+        <h2>Level 2 & 3: Reality Check 🧐</h2>
+        <p>Are you angry right now?</p>
+        <button onclick="mood('yes')">Yes 😡</button>
+        <button onclick="mood('no')">No 😘</button>
+        <p id="moodMsg"></p>
+        <hr>
+        <p>Rate your husband (0-10):</p>
+        <input type="range" id="rating" min="0" max="10" value="5" oninput="updateRating(this.value)">
+        <p id="ratingVal">Score: 5</p>
+        <button id="ratingBtn" onclick="checkRating()">Submit Rating</button>
+    </div>
+
+    <div id="screen-4" class="screen">
+        <h2>Level 4: Catch My Love! ❤️</h2>
+        <p>Score: <span id="score">0</span>/5</p>
+        <p>Click the falling hearts to collect love!</p>
+        <div id="game-area" style="height: 100px;"></div>
+    </div>
+
+    <div id="screen-5" class="screen">
+        <h2>Final Truth 🤫</h2>
+        <p id="finalText" style="font-style: italic;"></p>
+        <h1>Game Over 🎮</h1>
+        <p>Winner: My Wife 💖<br>Prize: Unlimited Love + Lifetime Annoyance 😜</p>
+        <button onclick="location.reload()">Play Again? 😂</button>
+    </div>
+</div>
+
+<script>
+    // Audio Placeholder (Note: Browsers require user interaction before playing audio)
+    const bgMusic = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'); // Replace with your link
+
+    function nextScreen(current, next) {
+        document.getElementById(`screen-${current}`).classList.remove('active');
+        document.getElementById(`screen-${next}`).classList.add('active');
+    }
+
+    // Level 1: Verification
+    function verifyWife() {
+        const name = document.getElementById('wifeName').value.toLowerCase();
+        const msg = document.getElementById('verifyMsg');
+        if(name.length > 2) {
+            msg.innerHTML = name.includes('wife') || name.includes('honey') ? 
+                "Access Granted: World’s Best Wife Detected 😍" : 
+                "Hmm… Suspicious 🤨 but still cute, entry allowed 😄";
+            setTimeout(() => nextScreen(1, 2), 2000);
+        }
+    }
+
+    // Level 2: Quiz
+    function quizResponse(choice) {
+        const msg = document.getElementById('quizMsg');
+        const responses = {
+            'Food': "Okay fair... but I’m close second 😭",
+            'Mom': "Respect 📈 but I’m still trying 😄",
+            'Me': "Correct answer! Smart wife 😘",
+            'You': "Exactly! You love yourself, as you should! 💅"
+        };
+        msg.innerText = responses[choice];
+        setTimeout(() => nextScreen(2, 3), 2000);
+    }
+
+    // Level 3: Mood & Rating
+    function mood(ans) {
+        const m = document.getElementById('moodMsg');
+        m.innerText = ans === 'yes' ? 
+            "System Error: Wife anger not supported ❌ Sending hugs 🤗" : 
+            "Yay! Peace restored in the universe 🌍💖";
+    }
+
+    function updateRating(val) {
+        document.getElementById('ratingVal').innerText = `Score: ${val}`;
+    }
+
+    function checkRating() {
+        const val = document.getElementById('rating').value;
+        const msg = document.getElementById('moodMsg');
+        if(val < 7) alert("This must be a bug 😳 please try again");
+        else if(val < 10) alert("Okay okay... I’ll improve 😄");
+        else {
+            alert("Correct answer detected 🎯 You deserve a gift 🎁");
+            nextScreen(3, 4);
+            startHeartGame();
+        }
+    }
+
+    // Level 4: Catch Game
+    let score = 0;
+    function startHeartGame() {
+        const interval = setInterval(() => {
+            if(score >= 5) {
+                clearInterval(interval);
+                setTimeout(() => {
+                    document.getElementById('finalText').innerText = "No matter how much I joke... I seriously got lucky with you ❤️ Thank you for handling me daily 😄";
+                    nextScreen(4, 5);
+                }, 1000);
+                return;
+            }
+            createHeart();
+        }, 800);
+    }
+
+    function createHeart() {
+        const h = document.createElement('div');
+        h.innerHTML = '❤️';
+        h.className = 'falling-heart';
+        h.style.left = Math.random() * 80 + 10 + '%';
+        h.style.top = '-50px';
+        document.body.appendChild(h);
+
+        let pos = -50;
+        const fall = setInterval(() => {
+            pos += 3;
+            h.style.top = pos + 'px';
+            if(pos > window.innerHeight) { clearInterval(fall); h.remove(); }
+        }, 20);
+
+        h.onclick = () => {
+            score++;
+            document.getElementById('score').innerText = score;
+            h.remove();
+            clearInterval(fall);
+        };
+    }
+
+    // Random Popups
+    setInterval(() => {
+        const popups = ["Reminder: You are beautiful 😍", "Reminder: Husband is trying his best 😂"];
+        const div = document.createElement('div');
+        div.className = 'popup';
+        div.innerText = popups[Math.floor(Math.random()*popups.length)];
+        document.body.appendChild(div);
+        setTimeout(() => div.remove(), 3000);
+    }, 10000);
+
+</script>
+</body>
+</html>
